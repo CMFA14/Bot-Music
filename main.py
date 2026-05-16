@@ -115,7 +115,8 @@ async def adicionar_musica(search, voice_channel=None):
         music_queue.append({'source': search, 'title': search + " (Fila)"})
         atualizar_status_file()
         if not voice.is_playing():
-            await tocar_proxima(voice)
+            # Inicia o download e o play em segundo plano, sem travar a resposta
+            bot.loop.create_task(tocar_proxima(voice))
         return True
     return False
 
