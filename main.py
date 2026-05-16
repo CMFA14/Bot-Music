@@ -159,8 +159,8 @@ async def start_server():
     resource_cmd = cors.add(app.router.add_resource("/api/comando"))
     cors.add(resource_cmd.add_route("POST", handle_post_comando))
 
-    # Servir arquivos estáticos da pasta 'web'
-    app.router.add_static('/', path='web', name='static')
+    # Servir arquivos estáticos da raiz
+    app.router.add_static('/', path='.', name='static')
     
     runner = web.AppRunner(app)
     await runner.setup()
