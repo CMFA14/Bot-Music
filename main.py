@@ -78,14 +78,27 @@ async def tocar_proxima(voice_client):
                 print(f"🎵 Começando a tocar: {current_song_title}")
 
             if os.path.exists("musica_temp.mp3"):
-                print(f"✅ Arquivo de áudio pronto. Iniciando FFmpeg...")
-                source = discord.FFmpegPCMAudio("musica_temp.mp3", executable=CAMINHO_FFMPEG)
-                def after_play(error):
-                    global is_playing
+                print(f"✅ Arquivo de áudio pronto ({os.path.getsize('musica_temp.mp3')} bytes). Iniciando FFmpeg...")
+                try:
+                    # Usando o player da forma mais simples possível para evitar erros
+                    source = discord.FFmpegPCMAudio("musica_temp.mp3", executable=CAMINHO_FFMPEG)
+                    
+                    def after_play(error):
+                        global is_playing
+                        is_playing = False
+                        if error:
+                            print(f"❌ Erro crítico no player: {error}")
+                        else:
+                            print(f"⏭️ Música finalizada com sucesso.")
+                        atualizar_status_file()
+                        bot.loop.create_task(tocar_proxima(voice_client))
+
+                    voice_client.play(source, after=after_play)
+                    print(f"🔊 Áudio enviado para o Discord!")
+                except Exception as player_error:
+                    print(f"❌ Falha ao iniciar o player: {player_error}")
                     is_playing = False
-                    atualizar_status_file()
                     bot.loop.create_task(tocar_proxima(voice_client))
-                voice_client.play(source, after=after_play)
         except Exception as e:
             print(f"Erro ao tocar: {e}")
             is_playing = False
