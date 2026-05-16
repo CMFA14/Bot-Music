@@ -38,7 +38,7 @@ YDL_OPTIONS = {
 
 intents = discord.Intents.default()
 intents.message_content = True
-bot = commands.Bot(command_prefix='/', intents=intents)
+bot = commands.Bot(command_prefix='!', intents=intents) # Mudei para ! para não confundir
 
 music_queue = []
 current_song_title = "Nada tocando"
@@ -182,17 +182,29 @@ async def start_server():
 async def on_ready():
     print(f'🔥 DJ Bot Online: {bot.user}')
     
-    # Sincroniza os comandos de barra com o Discord
+    # Sincroniza os comandos de barra instantaneamente em todos os servidores
     try:
-        synced = await bot.tree.sync()
-        print(f"✅ {len(synced)} comandos de barra sincronizados!")
+        for guild in bot.guilds:
+            bot.tree.copy_global_to(guild=guild)
+            await bot.tree.sync(guild=guild)
+        print(f"✅ Comandos de barra sincronizados em {len(bot.guilds)} servidores!")
     except Exception as e:
         print(f"Erro ao sincronizar comandos: {e}")
         
     atualizar_status_file()
     await start_server()
 
-# Comandos de Barra (Slash Commands)
+# --- COMANDOS DE TEXTO (Fallback/Plano B) ---
+@bot.command(name="play")
+async def play_text(ctx, *, search: str):
+    if not ctx.author.voice:
+        return await ctx.send("❌ Você precisa estar em um canal de voz!")
+    
+    success = await adicionar_musica(search, ctx.author.voice.channel)
+    if success:
+        await ctx.send(f"✅ Adicionado: **{search}**")
+
+# --- COMANDOS DE BARRA (Slash Commands) ---
 @bot.tree.command(name="play", description="Toca uma música no canal de voz")
 @discord.app_commands.describe(search="Nome da música ou link do YouTube")
 async def play(interaction: discord.Interaction, search: str):
