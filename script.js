@@ -1,6 +1,6 @@
 // --- CONFIGURAÇÃO ---
 // Se estiver rodando no Vercel, cole o link do seu Ngrok aqui abaixo:
-const API_URL = ""; // Ex: "https://abcd-123.ngrok-free.app"
+const API_URL = "https://noncircuitous-towerless-mozell.ngrok-free.dev"; // Ex: "https://abcd-123.ngrok-free.app"
 
 // Inicializar ícones do Lucide
 lucide.createIcons();
