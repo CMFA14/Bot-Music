@@ -7,7 +7,9 @@ lucide.createIcons();
 
 async function updateStatus() {
     try {
-        const response = await fetch(`${API_URL}/api/status`);
+        const response = await fetch(`${API_URL}/api/status`, {
+            headers: { 'ngrok-skip-browser-warning': 'true' }
+        });
         const data = await response.json();
 
         // Atualiza título da música
@@ -52,7 +54,10 @@ async function sendCommand(action, data = null) {
     try {
         const response = await fetch(`${API_URL}/api/comando`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 
+                'Content-Type': 'application/json',
+                'ngrok-skip-browser-warning': 'true'
+            },
             body: JSON.stringify({ action, data })
         });
         
