@@ -173,15 +173,49 @@ async def start_server():
 @bot.event
 async def on_ready():
     print(f'🔥 DJ Bot Online: {bot.user}')
+    
+    # Sincroniza os comandos de barra com o Discord
+    try:
+        synced = await bot.tree.sync()
+        print(f"✅ {len(synced)} comandos de barra sincronizados!")
+    except Exception as e:
+        print(f"Erro ao sincronizar comandos: {e}")
+        
     atualizar_status_file()
     await start_server()
 
-@bot.command()
-async def play(ctx, *, search):
-    if not ctx.author.voice: return await ctx.send("Entre na call!")
-    if not ctx.voice_client: await ctx.author.voice.channel.connect()
-    music_queue.append({'source': search, 'title': search + " (Discord)"})
-    if not ctx.voice_client.is_playing(): await tocar_proxima(ctx.voice_client)
-    await ctx.send(f"✅ Adicionado: {search}")
+# Comandos de Barra (Slash Commands)
+@bot.tree.command(name="play", description="Toca uma música no canal de voz")
+@discord.app_commands.describe(search="Nome da música ou link do YouTube")
+async def play(interaction: discord.Interaction, search: str):
+    await interaction.response.defer() # Dá tempo pro bot processar
+    
+    if not interaction.user.voice:
+        return await interaction.followup.send("❌ Você precisa estar em um canal de voz!")
+    
+    success = await adicionar_musica(search)
+    
+    if success:
+        await interaction.followup.send(f"✅ **{search}** adicionada à fila!")
+    else:
+        await interaction.followup.send("❌ Não consegui entrar no canal de voz.")
+
+@bot.tree.command(name="skip", description="Pula a música atual")
+async def skip(interaction: discord.Interaction):
+    for guild in bot.guilds:
+        if guild.voice_client and guild.voice_client.is_playing():
+            guild.voice_client.stop()
+            return await interaction.response.send_message("⏭️ Música pulada!")
+    await interaction.response.send_message("❌ Nada está tocando no momento.")
+
+@bot.tree.command(name="stop", description="Para tudo e desconecta o bot")
+async def stop(interaction: discord.Interaction):
+    for guild in bot.guilds:
+        if guild.voice_client:
+            music_queue.clear()
+            guild.voice_client.stop()
+            await guild.voice_client.disconnect()
+            return await interaction.response.send_message("🛑 Bot desconectado e fila limpa!")
+    await interaction.response.send_message("❌ O bot não está em nenhum canal.")
 
 bot.run(TOKEN)
