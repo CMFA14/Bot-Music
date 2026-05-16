@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DJ Bot | Premium Controller</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+    <div class="bg-glow"></div>
+    
+    <main class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="logo">
+                <i data-lucide="disc" class="icon-spin"></i>
+                <h1>DJ BOT<span>.CONTROL</span></h1>
+            </div>
+            <div id="connection-status" class="status-badge">
+                <span class="dot"></span> Verificando...
+            </div>
+        </header>
+
+        <!-- Player Section -->
+        <section class="player-card">
+            <div class="player-info">
+                <p class="label">TOCANDO AGORA</p>
+                <h2 id="song-title">Nada na fila...</h2>
+                <div class="player-visualizer">
+                    <div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div>
+                </div>
+            </div>
+            <div class="player-controls">
+                <button onclick="sendCommand('skip')" class="btn-secondary" title="Pular">
+                    <i data-lucide="skip-forward"></i>
+                </button>
+                <button onclick="sendCommand('stop')" class="btn-danger" title="Parar e Desconectar">
+                    <i data-lucide="power"></i>
+                </button>
+            </div>
+        </section>
+
+        <!-- Add Music -->
+        <section class="search-section">
+            <div class="input-group">
+                <i data-lucide="search"></i>
+                <input type="text" id="music-input" placeholder="Cole o link ou nome da música...">
+                <button onclick="addMusic()" class="btn-primary">
+                    <span>TOCAR</span>
+                    <i data-lucide="play-circle"></i>
+                </button>
+            </div>
+        </section>
+
+        <!-- Queue Section -->
+        <section class="queue-container">
+            <div class="queue-header">
+                <h3><i data-lucide="list-music"></i> Fila de Reprodução</h3>
+                <span id="queue-count" class="badge">0 músicas</span>
+            </div>
+            <ul id="queue-list" class="queue-list">
+                <!-- Músicas entram aqui -->
+            </ul>
+        </section>
+    </main>
+
+    <div id="toast" class="toast">Comando enviado!</div>
+
+    <script src="script.js"></script>
+</body>
+</html>

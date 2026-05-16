@@ -1,0 +1,20 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+
+# Bot Data
+status.json
+comandos.json
+historico.json
+musica_temp.mp3
+
+# Binaries (Too large for GitHub)
+ffmpeg.exe
+
+# OS
+.DS_Store
+Thumbs.db
+.env

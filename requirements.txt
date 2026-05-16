@@ -1,0 +1,8 @@
+discord.py
+yt-dlp
+aiohttp
+aiohttp-cors
+flask
+flask-cors
+streamlit
+python-dotenv
