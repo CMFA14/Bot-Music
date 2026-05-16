@@ -93,22 +93,30 @@ async def tocar_proxima(voice_client):
         is_playing = False
         atualizar_status_file()
 
-async def adicionar_musica(search):
-    for guild in bot.guilds:
+async def adicionar_musica(search, voice_channel=None):
+    # Se um canal foi passado, garante que o bot está lá
+    voice = None
+    if voice_channel:
+        guild = voice_channel.guild
         voice = guild.voice_client
         if not voice:
-            # Tenta conectar no primeiro canal com gente
-            for channel in guild.voice_channels:
-                if len(channel.members) > 0:
-                    voice = await channel.connect()
-                    break
-        
-        if voice:
-            music_queue.append({'source': search, 'title': search + " (Fila)"})
-            atualizar_status_file()
-            if not voice.is_playing():
-                await tocar_proxima(voice)
-            return True
+            voice = await voice_channel.connect()
+        elif voice.channel != voice_channel:
+            await voice.move_to(voice_channel)
+    
+    # Se não tem canal (comando vindo da Web), tenta achar o bot em algum lugar
+    if not voice:
+        for guild in bot.guilds:
+            if guild.voice_client:
+                voice = guild.voice_client
+                break
+
+    if voice:
+        music_queue.append({'source': search, 'title': search + " (Fila)"})
+        atualizar_status_file()
+        if not voice.is_playing():
+            await tocar_proxima(voice)
+        return True
     return False
 
 # --- SERVIDOR WEB (API) ---
@@ -193,12 +201,13 @@ async def play(interaction: discord.Interaction, search: str):
     if not interaction.user.voice:
         return await interaction.followup.send("❌ Você precisa estar em um canal de voz!")
     
-    success = await adicionar_musica(search)
+    # Passa o canal do usuário para o bot saber onde entrar
+    success = await adicionar_musica(search, interaction.user.voice.channel)
     
     if success:
         await interaction.followup.send(f"✅ **{search}** adicionada à fila!")
     else:
-        await interaction.followup.send("❌ Não consegui entrar no canal de voz.")
+        await interaction.followup.send("❌ Não consegui entrar no seu canal de voz.")
 
 @bot.tree.command(name="skip", description="Pula a música atual")
 async def skip(interaction: discord.Interaction):
