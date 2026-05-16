@@ -15,7 +15,7 @@ load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
 FILE_STATUS = "status.json"
 FILE_COMANDOS = "comandos.json"
-CAMINHO_FFMPEG = "./ffmpeg.exe"
+CAMINHO_FFMPEG = os.path.abspath("ffmpeg.exe") # Caminho absoluto para evitar erros
 
 YDL_OPTIONS = {
     'format': 'bestaudio/best',
@@ -75,8 +75,10 @@ async def tocar_proxima(voice_client):
                 current_song_title = info['title']
                 is_playing = True
                 atualizar_status_file()
+                print(f"🎵 Começando a tocar: {current_song_title}")
 
             if os.path.exists("musica_temp.mp3"):
+                print(f"✅ Arquivo de áudio pronto. Iniciando FFmpeg...")
                 source = discord.FFmpegPCMAudio("musica_temp.mp3", executable=CAMINHO_FFMPEG)
                 def after_play(error):
                     global is_playing
